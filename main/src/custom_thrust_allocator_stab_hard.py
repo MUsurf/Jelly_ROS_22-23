@@ -14,6 +14,10 @@ from std_msgs.msg import Int8
 from std_msgs.msg import Int32MultiArray
 # END MSGS
 
+# BEGIN SRV IMPORT
+from std_srvs.srv import SetBool,SetBoolResponse
+# END SRV IMPORT
+
 # BEGIN SETUP
 rospy.init_node("custom_thrust_allocator_stab")
 rate = rospy.Rate(50)
@@ -45,12 +49,14 @@ class ThrustAllocator():
         self.flag = 1
         self.publishers = rospy.Publisher('/command',Int32MultiArray,queue_size=1)
         self.add_wrench = numpy.zeros([3,1])
-        self.added_wrench = rospy.Subscriber('/jelly/add_wrench',WrenchStamped,self.import_add_wrench)
+        #self.added_wrench = rospy.Subscriber('/jelly/add_wrench',WrenchStamped,self.import_add_wrench)
         #self.flag_subscriber = rospy.Subscriber("/jelly/main_flag",Int8,self.import_flag)
         self.quaternion_subscriber = rospy.Subscriber('/imu/data', Imu, self.input_quaternion_orientation)
         #self.main_wrench_subscriber = rospy.Subscriber('/jelly/main/command_wrench', WrenchStamped,self.input_main_wrench)
         self.wrench_subscriber = rospy.Subscriber('/jelly/controller/command_wrench', WrenchStamped, self.input_wrench)
 
+        self.allocator_state = False
+        self.set_bool_service = rospy.Service('set_allocator_state',SetBool,self.allocator_state_callback)
     # def input_main_wrench(self,msg):
     #     if self.flag == 0:
     #         self.input_wrench(msg)
@@ -59,15 +65,21 @@ class ThrustAllocator():
     #     if self.flag == 1:
     #         self.input_wrench(msg)
 
-    def import_add_wrench(self,msg):
-        self.add_wrench[0,0] = msg.wrench.force.x
-        self.add_wrench[1,0] = msg.wrench.force.y
-        self.add_wrench[2,0] = msg.wrench.force.z
+    # def import_add_wrench(self,msg):
+    #     self.add_wrench[0,0] = msg.wrench.force.x
+    #     self.add_wrench[1,0] = msg.wrench.force.y
+    #     self.add_wrench[2,0] = msg.wrench.force.z
 
     # def import_flag(self,msg):
     #     #print("Flag")
     #     self.flag = msg.data
     #     #print(self.flag)
+    def allocator_state_callback(self,data):
+        a = SetBoolResponse()
+        a.message = "Receive successful, request received was: " + str(data.data)
+        self.allocator_state = data.data
+        print("Controller state has been changed to: " + str(self.allocator_state))
+        return a
 
     def input_quaternion_orientation(self, msg):
         self.x_sqd = msg.orientation.x ** 2
@@ -101,7 +113,34 @@ class ThrustAllocator():
         self.both = numpy.concatenate((self.force_body,self.torque_body))
 
         self.thruster_forces = numpy.dot(self.inverse_configuration_matrix,self.both)
+        print("Pre-Round Thruster Forces: ")
+        print(self.thruster_forces)
+        self.thruster_forces = self.round_thruster_forces(self.thruster_forces)
+        print("Post-Round Thruster Forces: ")
+        print(self.thruster_forces)
         self.publish_thruster_forces()
+
+    def round_thruster_forces(self,forces):
+        # This function, called by publish_thruster_forces, ensures that the resulting force vector is always in the direction intended by the controller.
+        # Even if the force requested is very high and would otherwise cause a set of motors to all spin up to their maximum power.
+        # round_thruster_forces should have no effect unless the requested force is higher than the vehicle can produce in a given direction.
+        T_200_max_forward = 51.45379819 # Newtons
+        T_200_max_backward = -39.92156178
+        # Assume that all positive thrust vectors point in the most efficient force direction for the given thruster.
+        thrust_quotient= 1
+        for j,force in enumerate(forces):
+            if force > T_200_max_forward or force < T_200_max_backward:
+                if force < 0:
+                    thrust_quotient_new = force / T_200_max_backward
+                    if thrust_quotient_new > thrust_quotient: # Ensures that all thrusts are only scaled by amount required by motor highest above it's limit.
+                        thrust_quotient = thrust_quotient_new
+                elif force > 0:
+                    thrust_quotient_new = force / T_200_max_forward
+                    if thrust_quotient_new > thrust_quotient: # Ensures that all thrusts are only scaled by amount required by motor highest above it's limit.
+                        thrust_quotient = thrust_quotient_new
+
+        forces = forces / thrust_quotient
+        return forces#,thrust_quotient
 
     def publish_thruster_forces(self):
         self.message = Int32MultiArray()
@@ -110,8 +149,12 @@ class ThrustAllocator():
         #self.message.layout.dim.stride = 0
         self.message.layout.data_offset = 0
         # self.message.header.stamp = rospy.Time()
-        for j in range(0,self.motorNum):
-            self.PWM_data[j] = int(self.get_input_value(self.thruster_forces[j],j))
+        if self.allocator_state == True:
+            for j in range(0,self.motorNum):
+                self.PWM_data[j] = int(self.get_input_value(self.thruster_forces[j],j))
+        if self.allocator_state == False:
+            for j in range(0,self.motorNum):
+                self.PWM_data[j] = 0
         #print(self.PWM_data)
         # for k in range(len(self.thruster_forces)):
             # self._frame_id = self.message.layout.dim.label[k]

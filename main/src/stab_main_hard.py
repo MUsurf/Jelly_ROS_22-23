@@ -2,176 +2,85 @@
 
 # BEGIN IMPORT
 import rospy
+import roslaunch
 # END IMPORT
 
 # BEGIN STD_MSGS
-from geometry_msgs.msg import WrenchStamped
-from sensor_msgs.msg import Imu
-from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Pose
-from std_msgs.msg import Int8
+import numpy
 import roslaunch
-import time
-from std_msgs.msg import Int32MultiArray
 # END STD_MSGS
+
+# BEGIN SRV IMPORT
+from std_srvs.srv import SetBool
+from jelly_description.srv import numpyArray
+# END SRV IMPORT
 
 rospy.init_node("stab_main")
 rate = rospy.Rate(50)
 
-class stabMain():
-    def __init__(self):
-        print("Test")
-        self.start_time = rospy.get_time()
-        self.main_command_publisher = rospy.Publisher("/jelly/main/command_wrench",WrenchStamped,queue_size=10)
-        self.main_pose_publisher = rospy.Publisher("/jelly/main/pose_gt",Odometry,queue_size=10)
-        self.main_quaternion_publisher = rospy.Publisher("/jelly/main/orientation",Imu,queue_size=10)
-        self.flag_publisher = rospy.Publisher("/jelly/main_flag",Int8,queue_size=10)
-        self.desired_pose_publisher = rospy.Publisher("/jelly/command_pose",Pose,queue_size=10)
-        self.add_wrench_pub = rospy.Publisher('/jelly/add_wrench',WrenchStamped,queue_size=10)
-        self.publishers = rospy.Publisher('/command',Int32MultiArray,queue_size=1)
-        self.flag = Int8()
-        self.start_esc = False
-        # self.create_main_command_wrench()
-        # self.create_main_pose()
-        # self.create_main_attitude()
-        # self.create_desired_pose_1()
+# The main function will be the service client. We want our first service to turn the controller on and off, for example.
+# Another service will allow us to give an input pose and have that sent to the controller.
+# A third service will allow a heading mode and will convert the input heading to a set of quaternion inputs.
+print("Waiting for controller state service")
+rospy.wait_for_service('set_controller_state')
+print("Waiting for allocator state service")
+rospy.wait_for_service('set_allocator_state')
+print("Waiting for command position service")
+rospy.wait_for_service('set_command_position')
+print("Waiting for command attitude service")
+rospy.wait_for_service('set_command_attitude')
+print("Waiting for attitude gain service.")
+rospy.wait_for_service('set_attitude_gains')
+print("Waiting for position gain service.")
+rospy.wait_for_service('set_position_gains')
+# THis is comment
+# Create service proxy functions.
 
-    # def create_main_command_wrench(self):
-    #     self.main_command_wrench = WrenchStamped()
-    #     self.main_command_wrench.header.seq = 0
-    #     self.main_command_wrench.header.frame_id = "id_1"
-    #     self.main_command_wrench.wrench.force.x = 0
-    #     self.main_command_wrench.wrench.force.y = 0
-    #     self.main_command_wrench.wrench.force.z = 0
-    #     self.main_command_wrench.wrench.torque.x = 0
-    #     self.main_command_wrench.wrench.torque.y = 0
-    #     self.main_command_wrench.wrench.torque.z = 0
+try:
+    controller_on_off = rospy.ServiceProxy('set_controller_state',SetBool)
+    # controller_on_off(True) / controller_on_off(False)
 
-    # def create_main_pose(self):
-    #     self.main_pose = Odometry()
-    #     self.main_pose.pose.pose.position.x = 0
-    #     self.main_pose.pose.pose.position.y = 0
-    #     self.main_pose.pose.pose.position.z = 0
-    
-    # def create_main_attitude(self):
-    #     self.main_attitude = Imu()
-    #     self.main_attitude.orientation.x = 0
-    #     self.main_attitude.orientation.y = 0
-    #     self.main_attitude.orientation.z = 0
-    #     self.main_attitude.orientation.w = 1
+    allocator_on_off = rospy.ServiceProxy('set_allocator_state',SetBool)
+    # allocator_on_off(True) / allocator_on_off(False)
 
-    def create_desired_pose_1(self):
-        self.desired_pose = Pose()
-        self.desired_pose.position.x = 0
-        self.desired_pose.position.y = 0
-        self.desired_pose.position.z = 0
-        self.desired_pose.orientation.x = 0
-        self.desired_pose.orientation.y = 0
-        self.desired_pose.orientation.z = 0
-        self.desired_pose.orientation.w = 1
+    command_position_serv_prox = rospy.ServiceProxy('set_command_position',numpyArray)
+    # command_position_numpy_array = numpy.array([[1.0],[1.0],[-5.0]])
+    # response = command_position_serv_prox([command_position_numpy_array[0,0],command_position_numpy_array[1,0],command_position_numpy_array[2,0]])
 
-    def create_desired_pose_2(self):
-        self.desired_pose.position.x = 0
-        self.desired_pose.position.y = 0
-        self.desired_pose.position.z = -0.6
-        self.desired_pose.orientation.x = 0
-        self.desired_pose.orientation.y = 0
-        self.desired_pose.orientation.z = 0
-        self.desired_pose.orientation.w = 1
+    command_attitude_serv_prox = rospy.ServiceProxy('set_command_attitude',numpyArray)
+    # command_attitude_numpy_array = numpy.array([[1.0],[0.0],[0.0],[0.0]]) # w,x,y,z
+    # response_att = command_attitude_serv_prox([command_attitude_numpy_array[0,0],command_attitude_numpy_array[1,0],command_attitude_numpy_array[2,0],command_attitude_numpy_array[3,0]])
 
-    def check_time(self):
-        # print("Check time")
-        # print(rospy.get_time())
-        while not rospy.is_shutdown():
-            #self.main_command_wrench.header.stamp = rospy.Time()
-            # self.main_pose.header.stamp = rospy.Time()
-            # self.main_attitude.header.stamp = rospy.Time()
-            #self.main_command_publisher.publish(self.main_command_wrench)
-            print("Self Main Pose: ")
-            #print(self.main_pose)
-            # self.main_pose_publisher.publish(self.main_pose)
-            # self.main_quaternion_publisher.publish(self.main_attitude)
-            print(rospy.get_time() - self.start_time)
-            if (rospy.get_time() - self.start_time) < 1:
-                # print("0")
-                # control_msg = Int32MultiArray()
-                # control_msg.data = [0,1950,1950,0,0,1950,1950,0]
-                self.create_desired_pose_1()
-                self.flag.data = 0
-                self.desired_pose_publisher.publish(self.desired_pose)
-                self.flag_publisher.publish(self.flag)
-                # if self.start_esc is False:
-                #     node_motor = 'motor_commander'
-                #     motor_commander_node = roslaunch.core.Node(package='motor_command',node_type='motor_commander.py',name=node_motor,output='screen')
-                #     launch = roslaunch.scriptapi.ROSLaunch()
-                #     launch.start()
-                #     launch.launch(motor_commander_node)
-                #     time.sleep(15)
-                #     self.start_esc = True
-                #self.publishers.publish(control_msg)
-            elif 1 <= (rospy.get_time() - self.start_time) <= 20:
-                if self.flag.data == 0:
-                    pkg = 'main'
-                    #print(type(pkg))
-                    launch = roslaunch.scriptapi.ROSLaunch()
-                    launch.start()
-                    node_control = 'custom_controller_stab_hard'
-                    #print(type(node_control))
-                    node_thrust = 'custom_thrust_allocator_stab_hard'
-                    depth_node = roslaunch.core.Node(package='ms5837',node_type='ms5837_ros.py',name='ms5837_node',output='screen')
-                    launch.launch(depth_node)
-                    rospy.wait_for_message('/rov/depth_odom',Odometry,timeout=20)
-                    #print(type(node_thrust))
-                    controller_node = roslaunch.core.Node(package=pkg,node_type='custom_controller_stab_hard_fix.py',name=node_control,output='screen')
-                    #print(type(controller_node))
-                    thrust_allocator_node = roslaunch.core.Node(package=pkg,node_type='custom_thrust_allocator_stab_hard.py',name=node_thrust,output='screen') 
-                    launch.launch(controller_node)
-                    launch.launch(thrust_allocator_node)
-                    # try:
-                    #     print("INT TRY")
-                    #     depth_pkg = 'ms5837'
-                    #     depth_node_1 = 'ms5837_ros'
-                    #     depth_node_2 = 'ms5837_variance'
-                    #     depth_node_1_ob = roslaunch.core.Node(package=depth_pkg,node_type='ms5837_ros.py',name=depth_node_1)
-                    #     depth_node_2_ob = roslaunch.core.Node(package=depth_pkg,node_type='ms5837_variance.py',name=depth_node_2)
-                    #     launch.launch(depth_node_1_ob)
-                    #     launch.launch(depth_node_2_ob)
-                    #     self.depth_sensor = True
-                    # except:
-                        # self.depth_sensor = False
-                # if self.depth_sensor:
-                print("1")
-                self.flag.data = 1
-                self.create_desired_pose_2()
-                self.desired_pose_publisher.publish(self.desired_pose)
-                self.flag_publisher.publish(self.flag)
-                # else:
-                #     self.add_wrench = WrenchStamped()
-                #     self.add_wrench.wrench.force.x = 0
-                #     self.add_wrench.wrench.force.y = 0
-                #     self.add_wrench.wrench.force.z = 40
-                #     self.add_wrench_pub.publish(self.add_wrench)
-            elif (rospy.get_time() - self.start_time) >= 20:
-                self.flag.data = 2
-                self.create_desired_pose_2()
-                self.desired_pose_publisher.publish(self.desired_pose)
-                self.flag_publisher.publish(self.flag)
-                # print("TO 20")
-                # control_msg = Int32MultiArray()
-                # control_msg.data = [1950,0,0,1950,1950,0,0,1950]
-                # self.publishers.publish(control_msg)
-                # self.desired_pose_publisher.publish(self.desired_pose)
-                # self.add_wrench = WrenchStamped()
-                # self.add_wrench.wrench.force.x = 100
-                # self.add_wrench.wrench.force.y = 0
-                # self.add_wrench.wrench.force.z = 0
-                # self.add_wrench_pub.publish(self.add_wrench)
-            rate.sleep()
+    # The controller will check that the provided quaternions are valid before applying them! It will default to the previous attitude reference if this is the case.
 
-node = stabMain()
+    attitude_gain_serv_prox = rospy.ServiceProxy('set_attitude_gains',numpyArray)
+    # new_attitude_gains = numpy.array([[-505.5],[100.5]]) # These gains are unstable but useful for testing.
+    # attitude_gain_serv_prox([new_attitude_gains[0,0],new_attitude_gains[1,0]])
 
-while not rospy.is_shutdown():
+    position_gain_serv_prox = rospy.ServiceProxy('set_position_gains',numpyArray)
+    # new_position_gains = numpy.array([[25.5],[4000],[42],[44]]) # P, I, D, N These gains are unstable but useful for testing.
+    # response_gain_1 = position_gain_serv_prox([new_position_gains[0,0],new_position_gains[1,0],new_position_gains[2,0],new_position_gains[3,0]])
 
-    node.check_time()
-    rate.sleep()
+except rospy.ServiceException as e:
+    print("Service proxy creation failed.")
 
+# Test of each proxy service.
+
+response_1 = controller_on_off(True)
+
+allocator_on_off(True) # Test of calling without intersecting message.
+
+command_position_numpy_array = numpy.array([[1.0],[1.0],[-5.0]])
+response = command_position_serv_prox([command_position_numpy_array[0,0],command_position_numpy_array[1,0],command_position_numpy_array[2,0]])
+
+command_attitude_numpy_array = numpy.array([[1.0],[0.0],[0.0],[0.0]]) # w,x,y,z
+response_att = command_attitude_serv_prox([command_attitude_numpy_array[0,0],command_attitude_numpy_array[1,0],command_attitude_numpy_array[2,0],command_attitude_numpy_array[3,0]])
+
+new_attitude_gains = numpy.array([[-505.5],[100.5]]) # These gains are unstable but useful for testing.
+#attitude_gain_serv_prox([new_attitude_gains[0,0],new_attitude_gains[1,0]])
+
+new_position_gains = numpy.array([[25.5],[4000],[42],[44]]) # P, I, D, N These gains are unstable but useful for testing.
+#response_gain_1 = position_gain_serv_prox([new_position_gains[0,0],new_position_gains[1,0],new_position_gains[2,0],new_position_gains[3,0]])
+
+#print(response)
+#print(response_2)

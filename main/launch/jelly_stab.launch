@@ -6,18 +6,23 @@
    <include file="$(find imu_bno055)/launch/imu.launch" >
    </include>
    
- <!--
+ 
    <node name="ms5837_driver" pkg="ms5837" type="ms5837_ros.py" />
-   -->
+   <!--
    <node name="stab_main_hard" pkg="main" type="stab_main_hard.py" />
+   -->
    <!--
    <node name="depth_filter" pkg="ms5837" type="ms5837_variance.py"/>
    -->
    <!--  
    <node name="volt_meter" pkg="main" type="volt_monitor.py"/>
-   
+   -->
+   <node name="custom_controller_stab" pkg="main" type="custom_controller_stab.py"/>
+
+   <node name="custom_thrust_allocator_stab" pkg="main" type="custom_thrust_allocator_stab.py"/>
+
    <node name="motor_commander" pkg="motor_command" type="motor_commander.py" />
--->
+   
    <node name="record" pkg="rosbag" type="record" args="-o $(find main)/rosbag /jelly/main/command_wrench /jelly/main/pose_gt /jelly/main/orientation /jelly/main_flag /jelly/command_pose /command /imu/data /jelly/controller/command_wrench /rov/depth_odom /usb_cam_node_front/image_raw/compressed /usb_cam_node_bottom/image_raw/compressed /rov/ms5837_filtered" />
 
 </launch>
