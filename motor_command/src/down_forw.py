@@ -24,10 +24,10 @@ class MainLoop():
     def __init__(self):
         self.callback_count = 201
         self.motorNum = 8
-        self.motor1 = pca.channels[0] # Correct
-        self.motor2 = pca.channels[7] # Correct
-        self.motor3 = pca.channels[1] # Correct
-        self.motor4 = pca.channels[6] # Correct
+        self.motor1 = pca.channels[7] # Correct
+        self.motor2 = pca.channels[0] # Correct
+        self.motor3 = pca.channels[6] # Correct
+        self.motor4 = pca.channels[1] # Correct
         self.motor5 = pca.channels[3] # Correct
         self.motor6 = pca.channels[4] # Correct
         self.motor7 = pca.channels[2] # Correct
@@ -103,84 +103,20 @@ print("Arming motors: ")
 loop.arm_seq()
 time.sleep(arming_time)
 
-print("Diving: ")
-loop.callback([front_motors,down_motors,down_motors,front_motors,front_motors,down_motors,down_motors,front_motors])
-time.sleep(diving_time)
-
-print("Forwarding: ")
-#############################################################
-front_motors = 2050
-down_motors = 1645
-#############################################################
-loop.callback([front_motors,down_motors,down_motors,front_motors,front_motors,down_motors,down_motors,front_motors-20])
-time.sleep(30)
-
-print("Forwarding: ")
-#############################################################
-front_motors = 2050
-down_motors = 1655
-#############################################################
-loop.callback([front_motors,down_motors,down_motors,front_motors,front_motors,down_motors,down_motors,front_motors-20])
-time.sleep(30)
-
-print("Forwarding: ")
-#############################################################
-front_motors = 2050
-down_motors = 1645
-#############################################################
-loop.callback([front_motors,down_motors,down_motors,front_motors,front_motors,down_motors,down_motors,front_motors-20])
-time.sleep(30)
-
-print("Forwarding: ")
-#############################################################
-front_motors = 2050
-down_motors = 1655
-#############################################################
-loop.callback([front_motors,down_motors,down_motors,front_motors,front_motors,down_motors,down_motors,front_motors-20])
-time.sleep(30)
-
-print("Forwarding: ")
-#############################################################
-front_motors = 2050
-down_motors = 1645
-#############################################################
-loop.callback([front_motors,down_motors,down_motors,front_motors,front_motors,down_motors,down_motors,front_motors-20])
-time.sleep(30)
-
-print("Forwarding: ")
-#############################################################
-front_motors = 2050
-down_motors = 1655
-#############################################################
-loop.callback([front_motors,down_motors,down_motors,front_motors,front_motors,down_motors,down_motors,front_motors-20])
-time.sleep(30)
-
-print("Forwarding: ")
-#############################################################
-front_motors = 2050
-down_motors = 1645
-#############################################################
-loop.callback([front_motors,down_motors,down_motors,front_motors,front_motors,down_motors,down_motors,front_motors-20])
-time.sleep(30)
-
-print("Forwarding: ")
-#############################################################
-front_motors = 2050
-down_motors = 1655
-#############################################################
-loop.callback([front_motors,down_motors,down_motors,front_motors,front_motors,down_motors,down_motors,front_motors-20])
-time.sleep(30)
-
-print("Forwarding: ")
-#############################################################
-front_motors = 2050
-down_motors = 1655
-#############################################################
-loop.callback([front_motors,down_motors,down_motors,front_motors,front_motors,down_motors,down_motors,front_motors-20])
-time.sleep(12)
-
-print("Surfacing: ")
+# print("Diving: ")
+# loop.callback([front_motors,down_motors,down_motors,front_motors,front_motors,down_motors,down_motors,front_motors])
+# time.sleep(diving_time)
 loop.set_all(1550)
+time.sleep(1)
 
-    
-    
+print("Forwarding: ")
+#############################################################
+front_motors = 2050
+down_motors = 1550
+left_motors = 2050
+right_motors = 1050
+#############################################################
+loop.callback([right_motors,down_motors,down_motors,right_motors,left_motors,down_motors,down_motors,left_motors])
+time.sleep(15)
+
+loop.callback([])

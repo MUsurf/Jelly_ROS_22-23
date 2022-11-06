@@ -13,18 +13,18 @@ import numpy as np
 # freshwater = 997 kg/m^3
 # seawater = 1029 kg/m^3
 
-def calculate(array):
-    mean = 0
-    #total = 0
-    if(len(array)>50):
-        array.pop(0)
-    mean = sum(array)
-    mean /= len(array)
-    #for point in array:
+# def calculate(array):
+#     mean = 0
+#     #total = 0
+#     if(len(array)>50):
+#         array.pop(0)
+#     mean = sum(array)
+#     mean /= len(array)
+#     #for point in array:
     #    total += (point - mean) * (point - mean)
     #total /= len(array)
     #print(mean)
-    return mean
+    #return mean
 
 class KalmanFilter:
 
@@ -83,8 +83,8 @@ if __name__ == '__main__':
         tf_frame = rospy.get_param("~tf_frame", "depth_sensor_link")
 
         pub = rospy.Publisher('rov/ms5837', ms5837_data, queue_size=1)
-        rate = rospy.Rate(75)  # 100Hz data read
-        sensor = ms5837_driver.MS5837_30BA()  # Default I2C bus is 1 (Raspberry Pi 3)
+        rate = rospy.Rate(20)  # 100Hz data read
+        sensor = ms5837_driver.MS5837_02BA(bus=1)  # Default I2C bus is 1 (Raspberry Pi 3)
         # sensor = ms5837.MS5837_02BA()
 
         sensor.setFluidDensity(int(fluid_density))
@@ -150,8 +150,8 @@ if __name__ == '__main__':
                 msg.header.stamp = rospy.Time.now()
                 msg.pose.pose.position.z = float(depth)
                 data.append(depth)
-                if(len(data) >= 50):
-                    msg.pose.pose.position.z = float(calculate(data))
+                # if(len(data) >= 50):
+                #     msg.pose.pose.position.z = float(calculate(data))
                 time_now = time.time()
                 msg.twist.twist.linear.z = float(velocity)
                 last_time = time_now
@@ -163,7 +163,7 @@ if __name__ == '__main__':
                 msg = PoseWithCovarianceStamped()
                 msg.header.frame_id = tf_frame
                 msg.header.stamp = rospy.Time.now()
-                msg.pose.pose.position.z = float(depth)
+                msg.pose.pose.position.z = 1#sensor.depth() #(float(depth) - 193)
                 msg.pose.covariance[14] = variance[0]
                 pose_pub.publish(msg)
 

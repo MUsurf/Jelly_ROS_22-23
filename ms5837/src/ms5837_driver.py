@@ -49,8 +49,8 @@ class MS5837(object):
     _MS5837_PROM_READ        = 0xA0
     _MS5837_CONVERT_D1_256   = 0x40
     _MS5837_CONVERT_D2_256   = 0x50
-    
-    def __init__(self, model=MODEL_30BA, bus=9):
+    # TO change bus, change line 87 in ms5837_ros.py. DO not change this file for bus changes!
+    def __init__(self, model=MODEL_30BA, bus=8):
         self._model = model
         
         try:

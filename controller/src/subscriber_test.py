@@ -40,14 +40,15 @@ class MainLoop():
 
         self.commanded = rospy.Publisher('/command', Int32MultiArray, queue_size=10)
         while not rospy.is_shutdown():
-            self.msg.data = [1550,1550,1550,1550,1550,1550,1650]
+            self.msg.data = [1550,1550,1550,1550,1550,1550,1550,1550]
             self.commanded.publish(self.msg)
             rate.sleep()
-            # for i in range(0,7):
-            #     self.msg.data[i] = 1600
-            #     self.commanded.publish(self.msg)
-            #     time.sleep(4)
-            #     self.msg.data = [1550,1550,1550,1550,1550,1550,1550]
+            for i in range(0,8):
+                self.msg.data[i] = 1650
+                print("Testing motor %2d" % i) 
+                self.commanded.publish(self.msg)
+                input('Press enter')
+                self.msg.data = [1550,1550,1550,1550,1550,1550,1550,1550]
         # while not rospy.is_shutdown():
         #     for i in range(1300,1700):
         #         self.msg.data = data_type(i)
@@ -67,5 +68,6 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         MainLoop.msg.data = data_type(0)
         MainLoop.commanded.publish(MainLoop.msg)
+        self.msg.data = [1550,1550,1550,1550,1550,1550,1550]
 # END LOOP
 # END ALL

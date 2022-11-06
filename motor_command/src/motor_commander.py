@@ -4,7 +4,7 @@
 import rospy
 import busio
 import time
-from board import SCL_1, SDA_1
+from board import SCL, SDA
 import adafruit_pca9685 as PCA9685
 # END IMPORT
 
@@ -16,7 +16,7 @@ from std_msgs.msg import Bool
 # BEGIN SETUP
 rospy.init_node("motor_commander")
 rate = rospy.Rate(100)
-i2c=busio.I2C(SCL_1,SDA_1)
+i2c=busio.I2C(SCL,SDA)
 pca = PCA9685.PCA9685(i2c, address = 0x40)
 pca.frequency = 280 # Hz
 # END SETUP
@@ -24,14 +24,14 @@ pca.frequency = 280 # Hz
 class MainLoop():
     def __init__(self):
         self.callback_count = 201
-        self.motorNum = 7
-        self.motor1 = pca.channels[0] # Correct
-        self.motor2 = pca.channels[7] # Correct
-        self.motor3 = pca.channels[1] # Correct
-        #self.motor4 = pca.channels[6] # Correct
-        self.motor5 = pca.channels[3] # Correct
+        self.motorNum = 8
+        self.motor1 = pca.channels[7] # Correct
+        self.motor2 = pca.channels[3] # Correct
+        self.motor3 = pca.channels[6] # Correct
+        self.motor4 = pca.channels[2] # Correct
+        self.motor5 = pca.channels[0] # Correct
         self.motor6 = pca.channels[4] # Correct
-        self.motor7 = pca.channels[2] # Correct
+        self.motor7 = pca.channels[1] # Correct
         self.motor8 = pca.channels[5] # Correct
 
     def microSec_to_duty(self,microSec,freq):
@@ -55,11 +55,11 @@ class MainLoop():
         self.motor1.duty_cycle = self.microSec_to_duty(message_rec.data[0],pca.frequency)
         self.motor2.duty_cycle = self.microSec_to_duty(message_rec.data[1],pca.frequency)
         self.motor3.duty_cycle = self.microSec_to_duty(message_rec.data[2],pca.frequency)
-        #self.motor4.duty_cycle = self.microSec_to_duty(message_rec.data[3],pca.frequency)
-        self.motor5.duty_cycle = self.microSec_to_duty(message_rec.data[3],pca.frequency)
-        self.motor6.duty_cycle = self.microSec_to_duty(message_rec.data[4],pca.frequency)
-        self.motor7.duty_cycle = self.microSec_to_duty(message_rec.data[5],pca.frequency)
-        self.motor8.duty_cycle = self.microSec_to_duty(message_rec.data[6],pca.frequency)
+        self.motor4.duty_cycle = self.microSec_to_duty(message_rec.data[3],pca.frequency)
+        self.motor5.duty_cycle = self.microSec_to_duty(message_rec.data[4],pca.frequency) #this was also 3, why?
+        self.motor6.duty_cycle = self.microSec_to_duty(message_rec.data[5],pca.frequency)
+        self.motor7.duty_cycle = self.microSec_to_duty(message_rec.data[6],pca.frequency)
+        self.motor8.duty_cycle = self.microSec_to_duty(message_rec.data[7],pca.frequency)
 
     def arm_seq(self):
         self.set_all(0)
@@ -82,7 +82,7 @@ class MainLoop():
         self.motor1.duty_cycle = self.microSec_to_duty(data[0],pca.frequency)
         self.motor2.duty_cycle = self.microSec_to_duty(data[1],pca.frequency)
         self.motor3.duty_cycle = self.microSec_to_duty(data[2],pca.frequency)
-        #self.motor4.duty_cycle = self.microSec_to_duty(data[3],pca.frequency)
+        self.motor4.duty_cycle = self.microSec_to_duty(data[3],pca.frequency)
         self.motor5.duty_cycle = self.microSec_to_duty(data[3],pca.frequency)
         self.motor6.duty_cycle = self.microSec_to_duty(data[4],pca.frequency)
         self.motor7.duty_cycle = self.microSec_to_duty(data[5],pca.frequency)

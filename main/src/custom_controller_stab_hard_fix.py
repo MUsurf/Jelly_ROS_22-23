@@ -18,22 +18,25 @@ from std_msgs.msg import Int8
 
 # BEGIN SETUP
 rospy.init_node("custom_controller_stab")
-update_rate = 50
+update_rate = 20
 rate = rospy.Rate(update_rate)
 # END SETUP
 # rando = Odometry()
 # rando.pose.pose.position.x
+
+sensor_d_const = 0
+
 class AttitudeController():
     def __init__(self):
         # Position control system gains
-        self.pos_proportional = 25.9374492277101
-        self.pos_integral = 3.63947016352946
-        self.pos_derivative = 41.8416925944087
-        self.pos_filter = 43.7209955392367
+        self.pos_proportional = 700#25.9374492277101
+        self.pos_integral = 0#3#3.63947016352946
+        self.pos_derivative = 0#31#41.8416925944087
+        self.pos_filter = 43#43.7209955392367
         self.update_time = 1/update_rate
         # Attitude control system gains
-        self.q_proportional = 5
-        self.omega_proportional = 2
+        self.q_proportional = 1 #5
+        self.omega_proportional = 1 #2
         # Desired position
         #self.reference_position = numpy.array([[0.0],[0.0],[-5.0]])
         # Desired attitude (can be changed to take quaternion inputs from trajectory at later date.) w, x, y, z
@@ -121,7 +124,7 @@ class AttitudeController():
         print("Input Pos: ")
         self.current_position[0,0] = msg.pose.pose.position.x
         self.current_position[1,0] = msg.pose.pose.position.y
-        self.current_position[2,0] = float(msg.pose.pose.position.z)
+        self.current_position[2,0] = -1 * (float(msg.pose.pose.position.z) - sensor_d_const)
         print(self.current_position)
 
     def input_quaternion_orientation(self, msg2):

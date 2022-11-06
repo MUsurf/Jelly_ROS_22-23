@@ -31,7 +31,7 @@ class ThrustAllocator():
         for j in  self.output_values_forw_T200:
                 self.output_values_forw_T100.append(j/2.2231)
         # tam = rospy.get_param('tam')
-        self.motorNum = 7
+        self.motorNum = 8
         self.configuration_matrix = self.calculate_TAM()
         #print(self.configuration_matrix)
         self.inverse_configuration_matrix = None
@@ -40,7 +40,10 @@ class ThrustAllocator():
         self.force_inertial = numpy.zeros([3,1])
         self.torque_body = numpy.zeros([3,1])
         self.DCM = numpy.zeros((3,3))
-        self.PWM_data = [0,0,0,0,0,0,0]
+        self.PWM_data = []
+        for lol in range(0,self.motorNum):
+            self.PWM_data.append(0)
+
         # self.topic_names = ['/jelly/thrusters/0/input','/jelly/thrusters/1/input','/jelly/thrusters/2/input','/jelly/thrusters/3/input','/jelly/thrusters/4/input','/jelly/thrusters/5/input','/jelly/thrusters/6/input','/jelly/thrusters/7/input']
         self.flag = 1
         self.publishers = rospy.Publisher('/command',Int32MultiArray,queue_size=1)
@@ -140,24 +143,24 @@ class ThrustAllocator():
             print("Too high")
             return self.thruster_input
         else:
-            l = 0
+            #l = 0
             for l in range(0,len(self.input_values)):
                 if force < active[l]:
                     output_inter_high = active[l]
                     output_inter_low = active[l-1]
                     break
-                l+=1
+                #l+=1
         input_inter_high = self.input_values[l]
         input_inter_low = self.input_values[l-1]
 
         return numpy.interp(force,[output_inter_low,output_inter_high],[input_inter_low,input_inter_high])
 
     def calculate_TAM(self):
-        #x_axis_normal_vectors = numpy.array([[1/sqrt(2),1/sqrt(2),0],[0,0,-1],[0,0,-1],[1/sqrt(2),-1/sqrt(2),0],[1/sqrt(2),1/sqrt(2),0],[0,0,-1],[0,0,-1],[1/sqrt(2),-1/sqrt(2),0]])
-        #position_vectors = numpy.array([[0.16931,-0.13868,-0.01801],[0.07044,-0.17671,0.07019],[-0.06964,-0.17671,0.07019],[-0.16848,-0.1387,-0.01801],[-0.16197,0.1428,-0.01801],[-0.06964,0.17529,0.07019],[0.07044,0.17529,0.07019],[0.16931,0.13726,-0.01801]])
+        x_axis_normal_vectors = numpy.array([[1/sqrt(2),1/sqrt(2),0],[0,0,-1],[0,0,-1],[1/sqrt(2),-1/sqrt(2),0],[1/sqrt(2),1/sqrt(2),0],[0,0,-1],[0,0,-1],[1/sqrt(2),-1/sqrt(2),0]])
+        position_vectors = numpy.array([[0.16931,-0.13868,-0.01801],[0.07044,-0.17671,0.07019],[-0.06964,-0.17671,0.07019],[-0.16848,-0.1387,-0.01801],[-0.16197,0.1428,-0.01801],[-0.06964,0.17529,0.07019],[0.07044,0.17529,0.07019],[0.16931,0.13726,-0.01801]])
 
-        x_axis_normal_vectors = numpy.array([[1/sqrt(2),1/sqrt(2),0],[0,0,-1],[0,0,-1],[1/sqrt(2),1/sqrt(2),0],[0,0,-1],[0,0,-1],[1/sqrt(2),-1/sqrt(2),0]])
-        position_vectors = numpy.array([[0.16931,-0.13868,-0.01801],[0.07044,-0.17671,0.07019],[-0.06964,-0.17671,0.07019],[-0.16197,0.1428,-0.01801],[-0.06964,0.17529,0.07019],[0.07044,0.17529,0.07019],[0.16931,0.13726,-0.01801]])
+        #x_axis_normal_vectors = numpy.array([[1/sqrt(2),1/sqrt(2),0],[0,0,-1],[0,0,-1],[1/sqrt(2),1/sqrt(2),0],[0,0,-1],[0,0,-1],[1/sqrt(2),-1/sqrt(2),0]])
+        #position_vectors = numpy.array([[0.16931,-0.13868,-0.01801],[0.07044,-0.17671,0.07019],[-0.06964,-0.17671,0.07019],[-0.16197,0.1428,-0.01801],[-0.06964,0.17529,0.07019],[0.07044,0.17529,0.07019],[0.16931,0.13726,-0.01801]])
 
         force_coefficients = numpy.zeros((3,self.motorNum))
 

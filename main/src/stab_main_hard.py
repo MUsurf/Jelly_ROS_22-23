@@ -73,7 +73,7 @@ class stabMain():
     def create_desired_pose_2(self):
         self.desired_pose.position.x = 0
         self.desired_pose.position.y = 0
-        self.desired_pose.position.z = -0.6
+        self.desired_pose.position.z = -1
         self.desired_pose.orientation.x = 0
         self.desired_pose.orientation.y = 0
         self.desired_pose.orientation.z = 0
