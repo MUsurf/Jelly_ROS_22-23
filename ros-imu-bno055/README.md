@@ -1,3 +1,5 @@
+Taken from: https://github.com/dheera/ros-imu-bno055
+
 # ROS driver for IMU Bosch BNO055 (I2C)
 
 This is a ROS node for the BNO055 IMU that communicates via I2C and without any dependencies besides libi2c-dev. It does **not** require RTIMULib, RTIMULib2, RTIMULib3 or whatever the latest sequel is. It is specifically targeted at using a BNO055 with NVIDIA boards such as the TX1, TX2, and Xavier, or any other board that has native I2C.

@@ -79,6 +79,15 @@ class stabMain():
         self.desired_pose.orientation.z = 0
         self.desired_pose.orientation.w = 1
 
+    def create_desired_pose_3(self):
+        self.desired_pose.position.x = 0
+        self.desired_pose.position.y = 0
+        self.desired_pose.position.z = -1
+        self.desired_pose.orientation.x = 0
+        self.desired_pose.orientation.y = 0.258819
+        self.desired_pose.orientation.z = 0
+        self.desired_pose.orientation.w = 0.9659258
+
     def check_time(self):
         # print("Check time")
         # print(rospy.get_time())
@@ -153,7 +162,7 @@ class stabMain():
                 #     self.add_wrench_pub.publish(self.add_wrench)
             elif (rospy.get_time() - self.start_time) >= 20:
                 self.flag.data = 2
-                self.create_desired_pose_2()
+                self.create_desired_pose_3()
                 self.desired_pose_publisher.publish(self.desired_pose)
                 self.flag_publisher.publish(self.flag)
                 # print("TO 20")

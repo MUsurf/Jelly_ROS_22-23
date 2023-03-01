@@ -16,7 +16,6 @@
 #include <smbus_functions.h>
 
 #define BNO055_ID 0xA0
-
 #define BNO055_ADDRESS_A 0x28 // default
 #define BNO055_ADDRESS_B 0x29
 
