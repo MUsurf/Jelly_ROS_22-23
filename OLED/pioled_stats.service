@@ -5,9 +5,10 @@ Description=PiOLED IP display service
 [Service]
 Type=simple
 User=surf
-ExecStart=/bin/sh -c "python3 /home/surf/Jelly_ROS_22-23/OLED/oled_ip.py"
-WorkingDirectory=/home/surf
+ExecStart=/usr/bin/python3 oled_ip.py
+WorkingDirectory=/home/surf/Jelly_ROS_22-23/OLED
 Restart=always
+RestartSec=300
 
 [Install]
 WantedBy=multi-user.target
