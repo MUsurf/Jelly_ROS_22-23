@@ -2,7 +2,7 @@
 import rospy
 import busio
 import board
-# from board import SCL, SDA
+# from board import SCL_1, SDA_1
 from std_msgs.msg import Int32MultiArray
 from adafruit_pca9685 import PCA9685
 
@@ -14,7 +14,7 @@ rospy.init_node("command_node")
 
 class MainLoop():
     def __init__(self):
-        self.i2c = busio.I2C(board.GPi,board.GP3)
+        self.i2c = busio.I2C(SCL_1,SDA_1)
         self.esc = PCA9685(self.i2c)
         self.esc.set_pwm_freq(280)
         rate = rospy.rate(5)
