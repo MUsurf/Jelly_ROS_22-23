@@ -1,0 +1,5 @@
+bagfile/
+build/
+devel/
+rospy
+smbus

@@ -4,7 +4,7 @@
 import rospy
 import busio
 import time
-from board import SCL, SDA
+from board import SCL_1, SDA_1
 import adafruit_pca9685 as PCA9685
 # END IMPORT
 
@@ -16,7 +16,7 @@ from std_msgs.msg import Bool
 # BEGIN SETUP
 rospy.init_node("motor_commander")
 rate = rospy.Rate(100)
-i2c=busio.I2C(SCL,SDA)
+i2c=busio.I2C(SCL_1,SDA_1)
 pca = PCA9685.PCA9685(i2c, address = 0x40)
 pca.frequency = 280 # Hz
 # END SETUP
