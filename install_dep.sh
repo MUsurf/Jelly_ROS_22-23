@@ -38,4 +38,26 @@ then
 	cd /home/surf/Jelly_ROS_22-23/
 fi
 
+#NOTE: to run, you must use code with the flag --no-sandbox
+#I sugest you create the following alias in ~/.bashrc
+#	alias code = "code --no-sandbox"
+#Also, to get the desktop icon to work, edit /usr/share/applications/code.desktop
+#	change the EXEC line to include the --no-sandbox flag:
+#	Exec=/usr/share/code/code --no-sandbox --unity-launch %F
 echo
+read -p "Do you want to install VScode [Y/N]" -n 1 -r
+
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+	cd /home/surf/Jelly_ROS_22-23/
+	sudo ./installVSCode.sh
+	echo "alias code = \"code --no-sandbox\"" >> /home/surf/.bashrc
+	source ~/.bashrc
+	echo -e "\n\nTo get the desktop icon to work, edit /usr/share/applications/code.desktop\n
+	change the EXEC line to include the --no-sandbox flag:\n
+	Exec=/usr/share/code/code --no-sandbox --unity-launch %F\n"
+fi
+
+echo
+
+
