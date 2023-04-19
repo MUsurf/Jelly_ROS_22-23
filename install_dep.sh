@@ -1,6 +1,7 @@
 #!/bin/bash
 
-read -p "Do you want to install ROS [Y/N]" -n 1 -r
+read -p "Do you want to install ROS [Y/N]: " -n 1 -r
+echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	# installing ROS -> https://linuxopsys.com/topics/install-ros-noetic-on-ubuntu
@@ -15,7 +16,8 @@ fi
 
 echo
 
-read -p "Do you want to install software dependencies catkin_ws [Y/N]" -n 1 -r
+read -p "Do you want to install software dependencies catkin_ws [Y/N]: " -n 1 -r
+echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	# install deps
@@ -30,7 +32,8 @@ fi
 
 echo
 
-read -p "Do you want to install OLED dependencies [Y/N]" -n 1 -r
+read -p "Do you want to install OLED dependencies [Y/N]: " -n 1 -r
+echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	cd /home/surf/Jelly_ROS_22-23/OLED
@@ -45,13 +48,13 @@ fi
 #	change the EXEC line to include the --no-sandbox flag:
 #	Exec=/usr/share/code/code --no-sandbox --unity-launch %F
 echo
-read -p "Do you want to install VScode [Y/N]" -n 1 -r
-
+read -p "Do you want to install VScode [Y/N]: " -n 1 -r
+echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	cd /home/surf/Jelly_ROS_22-23/
 	sudo ./installVSCode.sh
-	echo "alias code = \"code --no-sandbox\"" >> /home/surf/.bashrc
+	echo "alias code=\"code --no-sandbox\"" >> /home/surf/.bashrc
 	source ~/.bashrc
 	echo -e "\n\nTo get the desktop icon to work, edit /usr/share/applications/code.desktop\n
 	change the EXEC line to include the --no-sandbox flag:\n
