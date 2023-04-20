@@ -16,25 +16,25 @@ pca.frequency = 500
 
 # https://github.com/bitdump/BLHeli/blob/master/BLHeli_32%20ARM/BLHeli_32%20manual%20ARM%20Rev32.x.pdf
 # supports PWM 1000-2000 microsecond pulses
-def microSec_to_duty(microSec,freq):
+def microSec_to_duty_int(microSec,freq):
         samp_time = (1/freq) * 1000 * 1000 # Convert to Micro Sec
         duty_cycle = int((65536 * microSec)/(samp_time))
     #    print(duty_cycle)
         return duty_cycle
 
-def duty_percent_to_int(duty_percent):
+def duty_percent_to_duty_int(duty_percent):
 	return int(duty_percent * 65536)
 
 
 def set_all_duty(duty_percent):
-	duty = duty_percent_to_int(duty_percent)
+	duty = duty_percent_to_duty_int(duty_percent)
 	for i in range(8):
 		pca.channels[i].duty_cycle = duty
 	
   
 def set_all_ms(pwm_period_ms):
 	for i in range(8):
-		pca.channels[i].duty_cycle = microSec_to_duty(pwm_period_ms, pca.frequency)
+		pca.channels[i].duty_cycle = microSec_to_duty_int(pwm_period_ms, pca.frequency)
 
 def arm_seq():
 	set_all_ms(0)
@@ -58,15 +58,16 @@ arm_seq()
 #	print(i/100)
 #	pca.channels[0].duty_cycle = duty_percent_to_int(i/100)
 #	time.sleep(1)
-for i in range(8):
-	print("testing ", i)
-	pca.channels[i].duty_cycle = microSec_to_duty(1600, pca.frequency)
-	time.sleep(1)
-	pca.channels[i].duty_cycle = microSec_to_duty(1500, pca.frequency)
-	time.sleep(1)
-	pca.channels[i].duty_cycle = microSec_to_duty(1400, pca.frequency)
-	time.sleep(1)
-	pca.channels[i].duty_cycle = microSec_to_duty(1500, pca.frequency)
+i = 3
+print("testing ", i)
+pca.channels[i].duty_cycle = microSec_to_duty_int(1550, pca.frequency)
+time.sleep(5)
+pca.channels[i].duty_cycle = microSec_to_duty_int(1400, pca.frequency)
+time.sleep(5)
+pca.channels[i].duty_cycle = microSec_to_duty_int(1550, pca.frequency)
+time.sleep(5)
+pca.channels[i].duty_cycle = microSec_to_duty_int(1700, pca.frequency)
+time.sleep(5)
 clo_seq()
 
 # LEDs

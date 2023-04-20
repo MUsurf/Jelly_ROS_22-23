@@ -22,25 +22,28 @@ pca.frequency = 280 # Hz
 # END SETUP
 
 class MainLoop():
+    # Set channel numbers to motors here!
     def __init__(self):
         self.callback_count = 201
         self.motorNum = 8
-        self.motor1 = pca.channels[7] # Correct
-        self.motor2 = pca.channels[3] # Correct
-        self.motor3 = pca.channels[6] # Correct
-        self.motor4 = pca.channels[2] # Correct
-        self.motor5 = pca.channels[0] # Correct
-        self.motor6 = pca.channels[4] # Correct
-        self.motor7 = pca.channels[1] # Correct
-        self.motor8 = pca.channels[5] # Correct
+        self.motor1 = pca.channels[7]
+        self.motor2 = pca.channels[3]
+        self.motor3 = pca.channels[6]
+        self.motor4 = pca.channels[2]
+        self.motor5 = pca.channels[0]
+        self.motor6 = pca.channels[4]
+        self.motor7 = pca.channels[1]
+        self.motor8 = pca.channels[5]
 
-    def microSec_to_duty(self,microSec,freq):
-        samp_time = (1/freq) * 1000 * 1000 # Convert to Micro Sec
-        duty_cycle = int((65536 * microSec)/(samp_time))
+    #convert time in microseconds to a duty cycle number as a 16 bit int
+    def microSec_to_duty_int(self,microSec):
+        samp_time = (1/pca.frequency) * 1000 * 1000 # Convert to Micro Sec, 280 Hz = 3571 ms
+        duty_cycle = int((65536 * microSec)/(samp_time)) 
     #    print(duty_cycle)
         return duty_cycle
 
-    def data_type(self,num):
+    #creates an array of desired pwm values for each motor
+    def create_PWM_array(self,num):
         data = []
         for i in range(0,self.motorNum):
             data.append(0)
@@ -52,17 +55,18 @@ class MainLoop():
 
     def callback(self,message_rec):
         print("Data received is: " + str(message_rec.data))
-        self.motor1.duty_cycle = self.microSec_to_duty(message_rec.data[0],pca.frequency)
-        self.motor2.duty_cycle = self.microSec_to_duty(message_rec.data[1],pca.frequency)
-        self.motor3.duty_cycle = self.microSec_to_duty(message_rec.data[2],pca.frequency)
-        self.motor4.duty_cycle = self.microSec_to_duty(message_rec.data[3],pca.frequency)
-        self.motor5.duty_cycle = self.microSec_to_duty(message_rec.data[4],pca.frequency) #this was also 3, why?
-        self.motor6.duty_cycle = self.microSec_to_duty(message_rec.data[5],pca.frequency)
-        self.motor7.duty_cycle = self.microSec_to_duty(message_rec.data[6],pca.frequency)
-        self.motor8.duty_cycle = self.microSec_to_duty(message_rec.data[7],pca.frequency)
+        self.motor1.duty_cycle = self.microSec_to_duty_int(message_rec.data[0])
+        self.motor2.duty_cycle = self.microSec_to_duty_int(message_rec.data[1])
+        self.motor3.duty_cycle = self.microSec_to_duty_int(message_rec.data[2])
+        self.motor4.duty_cycle = self.microSec_to_duty_int(message_rec.data[3])
+        self.motor5.duty_cycle = self.microSec_to_duty_int(message_rec.data[4])
+        self.motor6.duty_cycle = self.microSec_to_duty_int(message_rec.data[5])
+        self.motor7.duty_cycle = self.microSec_to_duty_int(message_rec.data[6])
+        self.motor8.duty_cycle = self.microSec_to_duty_int(message_rec.data[7])
 
+    #motors must all be set to certain values to arm before they will turn on
     def arm_seq(self):
-        self.set_all(0)
+        self.set_all(0) #0ms, 0% duty cycle
         time.sleep(0.5)
 
         self.set_all(1000)
@@ -72,22 +76,20 @@ class MainLoop():
         time.sleep(0.5)
 
         self.set_all(1550)
-  #      time.sleep(0.5) #FOR TESTING PURPOSES! REMOVE BEFORE USE!
-  #      self.motor0.duty_cycle = self.microSec_to_duty(1600,pca.frequency)
 
-    def set_all(self,PWM_setting):
-        data = self.data_type(PWM_setting)
-        print(data[0])
-        print(int(pca.frequency))
-        self.motor1.duty_cycle = self.microSec_to_duty(data[0],pca.frequency)
-        self.motor2.duty_cycle = self.microSec_to_duty(data[1],pca.frequency)
-        self.motor3.duty_cycle = self.microSec_to_duty(data[2],pca.frequency)
-        self.motor4.duty_cycle = self.microSec_to_duty(data[3],pca.frequency)
-        self.motor5.duty_cycle = self.microSec_to_duty(data[3],pca.frequency)
-        self.motor6.duty_cycle = self.microSec_to_duty(data[4],pca.frequency)
-        self.motor7.duty_cycle = self.microSec_to_duty(data[5],pca.frequency)
-        self.motor8.duty_cycle = self.microSec_to_duty(data[6],pca.frequency)
+    #Set all motors to the provided PWM value in microsec
+    def set_all(self,PWM_microsec):
+        data = self.create_PWM_array(PWM_microsec)
+        self.motor1.duty_cycle = self.microSec_to_duty_int(data[0])
+        self.motor2.duty_cycle = self.microSec_to_duty_int(data[1])
+        self.motor3.duty_cycle = self.microSec_to_duty_int(data[2])
+        self.motor4.duty_cycle = self.microSec_to_duty_int(data[3])
+        self.motor5.duty_cycle = self.microSec_to_duty_int(data[4])
+        self.motor6.duty_cycle = self.microSec_to_duty_int(data[5])
+        self.motor7.duty_cycle = self.microSec_to_duty_int(data[6])
+        self.motor8.duty_cycle = self.microSec_to_duty_int(data[7])
 
+    #Disarm all motors by setting to 0
     def clo_seq(self):
         self.set_all(0)
 
@@ -103,8 +105,8 @@ if __name__ == '__main__':
         loop = MainLoop()
         loop.arm_seq()
         while not rospy.is_shutdown():
+            #Getts info from /command topic. Sets the motors to those values
             rospy.Subscriber("/command",Int32MultiArray,loop.callback)
-            # rospy.Subscriber("volt_low", Bool, loop.cut_motors)
             rospy.spin()
     
     except KeyboardInterrupt:

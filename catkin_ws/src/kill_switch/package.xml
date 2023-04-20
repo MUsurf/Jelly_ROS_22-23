@@ -1,22 +1,18 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>motor_command</name>
+  <name>kill_switch</name>
   <version>0.0.0</version>
-  <description>The motor_command package</description>
+  <description>This package contains the script to read values from GPIO pins connected to the kill_switch. Motor_command relies on this node.</description>
 
-  <maintainer email="muengrsurf@missouri.edu">MUSURF</maintainer>
+  <maintainer email="muengrsurf@missouri.edu">MUsurf</maintainer>
   <license>TODO</license>
 
   <url type="repository">https://github.com/MUsurf/Jelly_ROS_22-23</url>
   <author email="mariaclare08@gmail.com">Maria Lusardi</author>
-
+  
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
-  <build_export_depend>roscpp</build_export_depend>
-  <build_export_depend>rospy</build_export_depend>
-  <exec_depend>roscpp</exec_depend>
-  <exec_depend>rospy</exec_depend>
+  <build_depend>std_msgs</build_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
