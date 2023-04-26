@@ -5,27 +5,32 @@
 
 import Jetson.GPIO as GPIO
 import sys #temporary for testing with command line
+import rospy
+from std_msgs.msg import String
 
 out_pin = 7 #GPIO 9 = BOARD 7
 in_pin = 15 #GPIO 12 = BOARD 15
 
+pub = rospy.Publisher('kill_status', bool)
+rospy.init_node('kill_switch', anonymous=True)
+#rate = rospy.Rate(10) # 10hz	#unsure if this will be needed
 
 try:
 	GPIO.setmode(GPIO.BOARD)
-	
-	#Set GPIO 9 as output
-	GPIO.setup(out_pin, GPIO.OUT) 
+	GPIO.setup(out_pin, GPIO.OUT) #Set GPIO 9 as output
+	GPIO.setup(in_pin, GPIO.IN) #Read GPIO 12 as input (opt.)
+except Exception as e:
+	print(e)
+finally:
+	GPIO.cleanup()
 
-	#Read GPIO 12 as input (opt.)
-	GPIO.setup(in_pin, GPIO.IN) 
+while not rospy.is_shutdown():
 
-	# if turning motors on
-	if sys.argv[1] == "on":
-		# Set GPIO 9 HIGH
-		GPIO.output(out_pin, GPIO.HIGH)
-		# if GPIO 12 is HIGH
-		if GPIO.input(in_pin) == GPIO.HIGH:
-			print("Physical kill switch not connected")
+try:
+	GPIO.output(out_pin, GPIO.HIGH)	
+	if GPIO.input(in_pin) == GPIO.HIGH:		# if GPIO 12 is HIGH
+		pub.publish(False)
+		print("Physical kill switch not connected")
 
 	# if turning motors off
 	elif sys.argv[1] == "off":
