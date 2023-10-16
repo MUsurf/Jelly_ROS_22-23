@@ -6,7 +6,7 @@ def GetPosition(self):
     from board import SDA, SCL
 
     i2c0 = busio.I2C(SCL, SDA) # define I2C object
-    #D = ????? will be the one byte of data we recieve in the form of aninterger
+    #D = ????? will be the one byte of data we recieve in the form of an interger
     #-9 through 9
     #D represents the delay between the hydrophones
 
